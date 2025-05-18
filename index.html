@@ -1,100 +1,230 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phonemic Awareness Test</title>
   <style>
-    body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #f0f8ff; padding: 20px; text-align: center; }
-    .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .options button { font-size: 1.2em; margin: 10px; padding: 10px 20px; border-radius: 8px; border: 2px solid #ccc; cursor: pointer; transition: transform 0.3s, background 0.3s; }
-    .options button:hover { transform: scale(1.1); }
-    .selected { background-color: #d0ebff; border-color: #3a6ea5; transform: scale(1.2); }
-    #results { display: none; margin-top: 30px; }
-    button { background: #3a6ea5; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #2d5383; }
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #3a6ea5;
+    }
+    .question {
+      margin-top: 20px;
+    }
+    .options button {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: #e0ecff;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+    .options button:hover {
+      background-color: #c5dafb;
+      transform: scale(1.05);
+    }
+    #progress {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    #results {
+      display: none;
+      margin-top: 30px;
+    }
+    #password-input {
+      margin-top: 10px;
+    }
+    button.start-btn, button.submit-btn {
+      background-color: #3a6ea5;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+    button.start-btn:hover, button.submit-btn:hover {
+      background-color: #2d5383;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Phonemic Awareness Test</h1>
-    <p id="intro">Welcome to the Phonemic Awareness Test for Kindergartners and 1st Grade students. Click the correct answer to each question.</p>
-    <button onclick="startTest()">Start Test</button>
+    <p id="intro">Welcome to the Phonemic Awareness Test for Kindergartners and 1st Grade students. Click the correct picture that matches the answer to each question.</p>
+    <audio id="intro-audio" controls autoplay>
+      <source src="audio/Intro_Phonemic_Test_1.m4a" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <button class="start-btn" onclick="startTest()">Start Test</button>
+
     <div id="quiz" style="display:none;">
       <div id="question-container"></div>
-      <audio id="audio" controls style="margin-top: 20px;"></audio>
       <div id="progress"></div>
     </div>
+
     <div id="results">
       <h2>Your Results</h2>
       <p id="score"></p>
       <div id="password-section">
         <p>Teacher Access Only</p>
         <input type="password" id="password-input" placeholder="Enter Password">
-        <button onclick="checkPassword()">Submit</button>
+        <button class="submit-btn" onclick="checkPassword()">Submit</button>
         <p id="password-feedback" style="color:red;"></p>
       </div>
       <div id="detailed-results" style="display:none;"></div>
     </div>
   </div>
+
   <script>
-    const questions = [
-      { text: "Which word begins with the same sound as 'dog'?", audio: "Q01_Phonemic_Test_1.m4a", options: ["Cat", "Drum", "Fish", "Bug"], answer: 1 },
-      { text: "Which word rhymes with 'hat'?", audio: "Q02_Phonemic_Test_1.m4a", options: ["Hit", "Hot", "Cat", "Hut"], answer: 2 },
-      { text: "What sound does the letter 'S' make?", audio: "Q03_Phonemic_Test_1.m4a", options: ["/t/", "/s/", "/b/", "/a/"], answer: 1 },
-      { text: "Which of these words has the /m/ sound at the beginning?", audio: "Q04_Phonemic_Test_1.m4a", options: ["Map", "Cap", "Tap", "Nap"], answer: 0 },
-      { text: "Which word has the same ending sound as 'pen'?", audio: "Q05_Phonemic_Test_1.m4a", options: ["Pot", "Tin", "Run", "Hen"], answer: 3 },
-      { text: "What word do the sounds /b/ /a/ /t/ make?", audio: "Q06_Phonemic_Test_1.m4a", options: ["Bat", "Bit", "Bot", "Bet"], answer: 0 },
-      { text: "Which word does NOT rhyme with 'bug'?", audio: "Q07_Phonemic_Test_1.m4a", options: ["Hug", "Tug", "Jug", "Dog"], answer: 3 },
-      { text: "What is the beginning sound of 'kite'?", audio: "Q08_Phonemic_Test_1.m4a", options: ["/m/", "/k/", "/n/", "/d/"], answer: 1 },
-      { text: "Which word has the /ch/ sound?", audio: "Q09_Phonemic_Test_1.m4a", options: ["Chair", "Bear", "Pear", "Tear"], answer: 0 },
-      { text: "Which sound do you hear in the middle of 'cat'?", audio: "Q10_Phonemic_Test_1.m4a", options: ["/a/", "/o/", "/e/", "/i/"], answer: 0 }
-    ];
-    let current = 0, score = 0, selectedAnswers = [];
-    function startTest() {
-      document.getElementById("intro").style.display = "none";
-      document.querySelector("button").style.display = "none";
-      document.getElementById("quiz").style.display = "block";
-      showQuestion();
+    let currentQuestion = 0;
+    let score = 0;
+    let questions;
+
+    function getQuestions() {
+      return [
+        {
+          text: "Which word begins with the same sound as 'dog'?",
+          audio: "audio/Q01_Phonemic_Test_1.m4a",
+          options: ["Cat", "Drum", "Fish", "Bug"],
+          answer: 1
+        },
+        {
+          text: "Which word rhymes with 'hat'?",
+          audio: "audio/Q02_Phonemic_Test_1.m4a",
+          options: ["Hit", "Hot", "Cat", "Hut"],
+          answer: 2
+        },
+        {
+          text: "What sound does the letter 'S' make?",
+          audio: "audio/Q03_Phonemic_Test_1.m4a",
+          options: ["/t/", "/s/", "/b/", "/a/"],
+          answer: 1
+        },
+        {
+          text: "Which of these words has the /m/ sound at the beginning?",
+          audio: "audio/Q04_Phonemic_Test_1.m4a",
+          options: ["Map", "Cap", "Tap", "Nap"],
+          answer: 0
+        },
+        {
+          text: "Which word has the same ending sound as 'pen'?",
+          audio: "audio/Q05_Phonemic_Test_1.m4a",
+          options: ["Pot", "Tin", "Run", "Hen"],
+          answer: 3
+        },
+        {
+          text: "What word do the sounds /b/ /a/ /t/ make?",
+          audio: "audio/Q06_Phonemic_Test_1.m4a",
+          options: ["Bat", "Bit", "Bot", "Bet"],
+          answer: 0
+        },
+        {
+          text: "Which word does NOT rhyme with 'bug'?",
+          audio: "audio/Q07_Phonemic_Test_1.m4a",
+          options: ["Hug", "Tug", "Jug", "Dog"],
+          answer: 3
+        },
+        {
+          text: "What is the beginning sound of 'kite'?",
+          audio: "audio/Q08_Phonemic_Test_1.m4a",
+          options: ["/m/", "/k/", "/n/", "/d/"],
+          answer: 1
+        },
+        {
+          text: "Which word has the /ch/ sound?",
+          audio: "audio/Q09_Phonemic_Test_1.m4a",
+          options: ["Chair", "Bear", "Pear", "Tear"],
+          answer: 0
+        },
+        {
+          text: "Which sound do you hear in the middle of 'cat'?",
+          audio: "audio/Q10_Phonemic_Test_1.m4a",
+          options: ["/a/", "/o/", "/e/", "/i/"],
+          answer: 0
+        }
+      ];
     }
-    function showQuestion() {
-      const q = questions[current];
+
+    function startTest() {
+      questions = getQuestions();
+      document.getElementById("intro").style.display = "none";
+      document.getElementById("intro-audio").style.display = "none";
+      document.querySelector(".start-btn").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      renderQuestion(currentQuestion);
+    }
+
+    function renderQuestion(index) {
+      const q = questions[index];
       const container = document.getElementById("question-container");
-      container.innerHTML = `<h2>Question ${current + 1}</h2><p>${q.text}</p>`;
-      const optionsDiv = document.createElement("div");
-      optionsDiv.className = "options";
-      q.options.forEach((opt, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = opt;
-        btn.onclick = () => selectAnswer(index);
+
+      container.innerHTML = `
+        <h2>Question ${index + 1} of ${questions.length}</h2>
+        <p>${q.text}</p>
+        <audio controls autoplay>
+          <source src="${q.audio}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+        <div class="options"></div>
+      `;
+
+      const optionsDiv = container.querySelector('.options');
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.onclick = () => handleAnswer(i);
         optionsDiv.appendChild(btn);
       });
-      container.appendChild(optionsDiv);
-      document.getElementById("audio").src = q.audio;
-      document.getElementById("progress").textContent = `Question ${current + 1} of ${questions.length}`;
+
+      document.getElementById("progress").innerText = `Progress: ${index + 1}/${questions.length}`;
     }
-    function selectAnswer(index) {
-      selectedAnswers.push(index);
-      if (index === questions[current].answer) score++;
-      current++;
-      if (current < questions.length) showQuestion();
-      else finishTest();
+
+    function handleAnswer(selected) {
+      if (selected === questions[currentQuestion].answer) {
+        score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        renderQuestion(currentQuestion);
+      } else {
+        showResults();
+      }
     }
-    function finishTest() {
+
+    function showResults() {
       document.getElementById("quiz").style.display = "none";
       document.getElementById("results").style.display = "block";
-      document.getElementById("score").textContent = `You got ${score} out of ${questions.length} correct.`;
+      document.getElementById("score").innerText = `You got ${score} out of ${questions.length} correct!`;
     }
+
     function checkPassword() {
       const input = document.getElementById("password-input").value;
+      const feedback = document.getElementById("password-feedback");
       if (input === "1935") {
-        const details = document.getElementById("detailed-results");
-        details.style.display = "block";
-        details.innerHTML = "<h3>Detailed Results:</h3>" + questions.map((q, i) => {
-          return `<p>Q${i + 1}: Your Answer - ${q.options[selectedAnswers[i]]}, Correct - ${q.options[q.answer]}</p>`;
+        document.getElementById("detailed-results").style.display = "block";
+        feedback.textContent = "";
+        document.getElementById("detailed-results").innerHTML = questions.map((q, i) => {
+          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer]}</p>`;
         }).join('');
       } else {
-        document.getElementById("password-feedback").textContent = "Incorrect password.";
+        feedback.textContent = "Incorrect password.";
       }
     }
   </script>
