@@ -25,20 +25,27 @@
     .question {
       margin-top: 20px;
     }
-    .options button, .repeat-btn {
+    .options button {
       display: inline-block;
       margin: 10px;
-      padding: 10px 20px;
+      padding: 10px;
       font-size: 18px;
       border-radius: 10px;
       border: none;
       background-color: #e0ecff;
       cursor: pointer;
       transition: transform 0.2s, background-color 0.3s;
+      width: 160px;
     }
-    .options button:hover, .repeat-btn:hover {
+    .options button:hover {
       background-color: #c5dafb;
       transform: scale(1.05);
+    }
+    .options img {
+      width: 100px;
+      height: 100px;
+      display: block;
+      margin: 0 auto 5px;
     }
     #progress {
       margin-top: 20px;
@@ -69,7 +76,7 @@
     <h1>Phonemic Awareness Test</h1>
     <p id="intro">Welcome to the Phonemic Awareness Test for Kindergartners and 1st Grade students. Click the correct picture that matches the answer to each question.</p>
     <audio id="intro-audio" controls autoplay>
-      <source src="audio/intro.m4a" type="audio/mpeg">
+      <source src="audio/Intro_Phonemic_Test_1.m4a" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
     <button class="start-btn" onclick="startTest()">Start Test</button>
@@ -93,10 +100,14 @@
   </div>
 
   <script>
-    window.getQuestions = function() {
+    let currentQuestion = 0;
+    let score = 0;
+    let questions;
+
+    function getQuestions() {
       return [
         {
-           text: "Which word begins with the same sound as 'dog'?",
+          text: "Which word begins with the same sound as 'dog'?",
           audio: "audio/Q01_Phonemic_Test_1.m4a",
           options: [
             { label: "Cat", image: "images/Cat.png" },
@@ -207,13 +218,9 @@
         }
       ];
     }
-    
-     let currentQuestion = 0;
-    let score = 0;
-    const questions = getQuestions();
-    let currentAudio;
 
     function startTest() {
+      questions = getQuestions();
       document.getElementById("intro").style.display = "none";
       document.getElementById("intro-audio").style.display = "none";
       document.querySelector(".start-btn").style.display = "none";
@@ -228,31 +235,22 @@
       container.innerHTML = `
         <h2>Question ${index + 1} of ${questions.length}</h2>
         <p>${q.text}</p>
-        <audio id="question-audio" controls autoplay>
+        <audio controls autoplay>
           <source src="${q.audio}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-        <button class="repeat-btn" onclick="repeatAudio()">Repeat Question</button>
         <div class="options"></div>
       `;
 
       const optionsDiv = container.querySelector('.options');
       q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
-        btn.innerText = opt;
+        btn.innerHTML = `<img src="${opt.image}" alt="${opt.label}"><br>${opt.label}`;
         btn.onclick = () => handleAnswer(i);
         optionsDiv.appendChild(btn);
       });
 
       document.getElementById("progress").innerText = `Progress: ${index + 1}/${questions.length}`;
-    }
-
-    function repeatAudio() {
-      const audio = document.getElementById("question-audio");
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-      }
     }
 
     function handleAnswer(selected) {
@@ -263,7 +261,6 @@
       if (currentQuestion < questions.length) {
         renderQuestion(currentQuestion);
       } else {
-        document.getElementById("question-container").innerHTML = `<h2>You've completed the test!</h2>`;
         showResults();
       }
     }
@@ -271,7 +268,6 @@
     function showResults() {
       document.getElementById("quiz").style.display = "none";
       document.getElementById("results").style.display = "block";
-      document.getElementById("score").innerText = `You got ${score} out of ${questions.length} correct!`;
     }
 
     function checkPassword() {
@@ -280,8 +276,8 @@
       if (input === "1935") {
         document.getElementById("detailed-results").style.display = "block";
         feedback.textContent = "";
-        document.getElementById("detailed-results").innerHTML = questions.map((q, i) => {
-          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer]}</p>`;
+        document.getElementById("detailed-results").innerHTML = `Score: ${score} / ${questions.length}` + questions.map((q, i) => {
+          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer].label}</p>`;
         }).join('');
       } else {
         feedback.textContent = "Incorrect password.";
