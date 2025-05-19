@@ -220,6 +220,7 @@
     }
 
     function startTest() {
+      questions = getQuestions();
       document.getElementById("intro").style.display = "none";
       document.getElementById("intro-audio").style.display = "none";
       document.querySelector(".start-btn").style.display = "none";
@@ -234,31 +235,22 @@
       container.innerHTML = `
         <h2>Question ${index + 1} of ${questions.length}</h2>
         <p>${q.text}</p>
-        <audio id="question-audio" controls autoplay>
+        <audio controls autoplay>
           <source src="${q.audio}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-        <button class="repeat-btn" onclick="repeatAudio()">Repeat Question</button>
         <div class="options"></div>
       `;
 
       const optionsDiv = container.querySelector('.options');
       q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
-        btn.innerText = opt;
+        btn.innerHTML = `<img src="${opt.image}" alt="${opt.label}"><br>${opt.label}`;
         btn.onclick = () => handleAnswer(i);
         optionsDiv.appendChild(btn);
       });
 
       document.getElementById("progress").innerText = `Progress: ${index + 1}/${questions.length}`;
-    }
-
-    function repeatAudio() {
-      const audio = document.getElementById("question-audio");
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-      }
     }
 
     function handleAnswer(selected) {
@@ -269,7 +261,6 @@
       if (currentQuestion < questions.length) {
         renderQuestion(currentQuestion);
       } else {
-        document.getElementById("question-container").innerHTML = `<h2>You've completed the test!</h2>`;
         showResults();
       }
     }
@@ -277,7 +268,6 @@
     function showResults() {
       document.getElementById("quiz").style.display = "none";
       document.getElementById("results").style.display = "block";
-      document.getElementById("score").innerText = `You got ${score} out of ${questions.length} correct!`;
     }
 
     function checkPassword() {
@@ -286,8 +276,8 @@
       if (input === "1935") {
         document.getElementById("detailed-results").style.display = "block";
         feedback.textContent = "";
-        document.getElementById("detailed-results").innerHTML = questions.map((q, i) => {
-          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer]}</p>`;
+        document.getElementById("detailed-results").innerHTML = `Score: ${score} / ${questions.length}` + questions.map((q, i) => {
+          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer].label}</p>`;
         }).join('');
       } else {
         feedback.textContent = "Incorrect password.";
