@@ -25,27 +25,20 @@
     .question {
       margin-top: 20px;
     }
-    .options button {
+    .options button, .repeat-btn {
       display: inline-block;
       margin: 10px;
-      padding: 10px;
+      padding: 10px 20px;
       font-size: 18px;
       border-radius: 10px;
       border: none;
       background-color: #e0ecff;
       cursor: pointer;
       transition: transform 0.2s, background-color 0.3s;
-      width: 160px;
     }
-    .options button:hover {
+    .options button:hover, .repeat-btn:hover {
       background-color: #c5dafb;
       transform: scale(1.05);
-    }
-    .options img {
-      width: 100px;
-      height: 100px;
-      display: block;
-      margin: 0 auto 5px;
     }
     #progress {
       margin-top: 20px;
@@ -76,7 +69,7 @@
     <h1>Phonemic Awareness Test</h1>
     <p id="intro">Welcome to the Phonemic Awareness Test for Kindergartners and 1st Grade students. Click the correct picture that matches the answer to each question.</p>
     <audio id="intro-audio" controls autoplay>
-      <source src="audio/Intro_Phonemic_Test_1.m4a" type="audio/mpeg">
+      <source src="audio/intro.m4a" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
     <button class="start-btn" onclick="startTest()">Start Test</button>
@@ -100,127 +93,77 @@
   </div>
 
   <script>
-    let currentQuestion = 0;
-    let score = 0;
-    let questions;
-
-    function getQuestions() {
+    window.getQuestions = function() {
       return [
         {
           text: "Which word begins with the same sound as 'dog'?",
           audio: "audio/Q01_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Cat", image: "images/Cat.png" },
-            { label: "Drum", image: "images/Drum.png" },
-            { label: "Fish", image: "images/Fish.png" },
-            { label: "Bug", image: "images/Bug.png" }
-          ],
+          options: ["Cat", "Drum", "Fish", "Bug"],
           answer: 1
         },
         {
           text: "Which word rhymes with 'hat'?",
           audio: "audio/Q02_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Hit", image: "images/Hit.png" },
-            { label: "Hot", image: "images/Hot.png" },
-            { label: "Cat", image: "images/Cat.png" },
-            { label: "Hut", image: "images/Hut.png" }
-          ],
+          options: ["Hit", "Hot", "Cat", "Hut"],
           answer: 2
         },
         {
           text: "What sound does the letter 'S' make?",
           audio: "audio/Q03_Phonemic_Test_1.m4a",
-          options: [
-            { label: "/t/", image: "images/t.png" },
-            { label: "/s/", image: "images/s.png" },
-            { label: "/b/", image: "images/b.png" },
-            { label: "/a/", image: "images/a.png" }
-          ],
+          options: ["/t/", "/s/", "/b/", "/a/"],
           answer: 1
         },
         {
           text: "Which of these words has the /m/ sound at the beginning?",
           audio: "audio/Q04_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Map", image: "images/Map.png" },
-            { label: "Cap", image: "images/Cap.png" },
-            { label: "Tap", image: "images/Tap.png" },
-            { label: "Nap", image: "images/Nap.png" }
-          ],
+          options: ["Map", "Cap", "Tap", "Nap"],
           answer: 0
         },
         {
           text: "Which word has the same ending sound as 'pen'?",
           audio: "audio/Q05_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Pot", image: "images/Pot.png" },
-            { label: "Tin", image: "images/Tin.png" },
-            { label: "Run", image: "images/Run.png" },
-            { label: "Hen", image: "images/Hen.png" }
-          ],
+          options: ["Pot", "Tin", "Run", "Hen"],
           answer: 3
         },
         {
           text: "What word do the sounds /b/ /a/ /t/ make?",
           audio: "audio/Q06_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Bat", image: "images/Bat.png" },
-            { label: "Bit", image: "images/Bit.png" },
-            { label: "Bot", image: "images/Bot.png" },
-            { label: "Bet", image: "images/Bet.png" }
-          ],
+          options: ["Bat", "Bit", "Bot", "Bet"],
           answer: 0
         },
         {
           text: "Which word does NOT rhyme with 'bug'?",
           audio: "audio/Q07_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Hug", image: "images/Hug.png" },
-            { label: "Tug", image: "images/Bug.png" },
-            { label: "Jug", image: "images/Jug.png" },
-            { label: "Dog", image: "images/Dog.png" }
-          ],
+          options: ["Hug", "Tug", "Jug", "Dog"],
           answer: 3
         },
         {
           text: "What is the beginning sound of 'kite'?",
           audio: "audio/Q08_Phonemic_Test_1.m4a",
-          options: [
-            { label: "/m/", image: "images/m.png" },
-            { label: "/k/", image: "images/k.png" },
-            { label: "/n/", image: "images/n.png" },
-            { label: "/d/", image: "images/d.png" }
-          ],
+          options: ["/m/", "/k/", "/n/", "/d/"],
           answer: 1
         },
         {
           text: "Which word has the /ch/ sound?",
           audio: "audio/Q09_Phonemic_Test_1.m4a",
-          options: [
-            { label: "Chair", image: "images/Chair.png" },
-            { label: "Bear", image: "images/Bear.png" },
-            { label: "Pear", image: "images/Pear.png" },
-            { label: "Tear", image: "images/Tear.png" }
-          ],
+          options: ["Chair", "Bear", "Pear", "Tear"],
           answer: 0
         },
         {
           text: "Which sound do you hear in the middle of 'cat'?",
           audio: "audio/Q10_Phonemic_Test_1.m4a",
-          options: [
-            { label: "/a/", image: "images/a.png" },
-            { label: "/o/", image: "images/o.png" },
-            { label: "/e/", image: "images/e.png" },
-            { label: "/i/", image: "images/i.png" }
-          ],
+          options: ["/a/", "/o/", "/e/", "/i/"],
           answer: 0
         }
       ];
-    }
+    };
+
+    let currentQuestion = 0;
+    let score = 0;
+    const questions = getQuestions();
+    let currentAudio;
 
     function startTest() {
-      questions = getQuestions();
       document.getElementById("intro").style.display = "none";
       document.getElementById("intro-audio").style.display = "none";
       document.querySelector(".start-btn").style.display = "none";
@@ -235,22 +178,31 @@
       container.innerHTML = `
         <h2>Question ${index + 1} of ${questions.length}</h2>
         <p>${q.text}</p>
-        <audio controls autoplay>
+        <audio id="question-audio" controls autoplay>
           <source src="${q.audio}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
+        <button class="repeat-btn" onclick="repeatAudio()">Repeat Question</button>
         <div class="options"></div>
       `;
 
       const optionsDiv = container.querySelector('.options');
       q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
-        btn.innerHTML = `<img src="${opt.image}" alt="${opt.label}"><br>${opt.label}`;
+        btn.innerText = opt;
         btn.onclick = () => handleAnswer(i);
         optionsDiv.appendChild(btn);
       });
 
       document.getElementById("progress").innerText = `Progress: ${index + 1}/${questions.length}`;
+    }
+
+    function repeatAudio() {
+      const audio = document.getElementById("question-audio");
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+      }
     }
 
     function handleAnswer(selected) {
@@ -261,6 +213,7 @@
       if (currentQuestion < questions.length) {
         renderQuestion(currentQuestion);
       } else {
+        document.getElementById("question-container").innerHTML = `<h2>You've completed the test!</h2>`;
         showResults();
       }
     }
@@ -268,6 +221,7 @@
     function showResults() {
       document.getElementById("quiz").style.display = "none";
       document.getElementById("results").style.display = "block";
+      document.getElementById("score").innerText = `You got ${score} out of ${questions.length} correct!`;
     }
 
     function checkPassword() {
@@ -276,8 +230,8 @@
       if (input === "1935") {
         document.getElementById("detailed-results").style.display = "block";
         feedback.textContent = "";
-        document.getElementById("detailed-results").innerHTML = `Score: ${score} / ${questions.length}` + questions.map((q, i) => {
-          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer].label}</p>`;
+        document.getElementById("detailed-results").innerHTML = questions.map((q, i) => {
+          return `<p>Q${i+1}: ${q.text}<br>Answer: ${q.options[q.answer]}</p>`;
         }).join('');
       } else {
         feedback.textContent = "Incorrect password.";
