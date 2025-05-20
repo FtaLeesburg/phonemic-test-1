@@ -219,7 +219,7 @@
       ];
     }
 
-    function startTest() {
+function startTest() {
       questions = getQuestions();
       document.getElementById("intro").style.display = "none";
       document.getElementById("intro-audio").style.display = "none";
@@ -235,13 +235,11 @@
       container.innerHTML = `
         <h2>Question ${index + 1} of ${questions.length}</h2>
         <p>${q.text}</p>
-        <audio id="question-audio" controls autoplay>
+        <audio controls autoplay>
           <source src="${q.audio}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-        <br>
-        <button onclick="repeatAudio()" style="margin-top:10px;">🔁 Repeat Question</button>
-        <div class="options" style="margin-top:20px;"></div>
+        <div class="options"></div>
       `;
 
       const optionsDiv = container.querySelector('.options');
@@ -253,14 +251,6 @@
       });
 
       document.getElementById("progress").innerText = `Progress: ${index + 1}/${questions.length}`;
-    }
-
-    function repeatAudio() {
-      const audio = document.getElementById("question-audio");
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-      }
     }
 
     function handleAnswer(selected) {
@@ -275,11 +265,11 @@
       }
     }
 
-    function showResults() {
-      document.getElementById("quiz").style.display = "none";
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.style.display = "block";
-      document.getElementById("score").innerHTML = `You scored ${score} out of ${questions.length}.<br><strong>You have completed the test!</strong>`;
+    function repeatAudio() {
+      const audio = document.getElementById("question-audio");;
+      if (audio) {
+      audio.currentTime = 0;
+      audio.play();
     }
 
     function checkPassword() {
