@@ -265,11 +265,9 @@ function startTest() {
       }
     }
 
-    function repeatAudio() {
-      const audio = document.getElementById("question-audio");;
-      if (audio) {
-      audio.currentTime = 0;
-      audio.play();
+    function showResults() {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("results").style.display = "block";
     }
 
     function checkPassword() {
